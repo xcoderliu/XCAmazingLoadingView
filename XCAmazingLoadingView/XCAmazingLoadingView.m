@@ -180,7 +180,7 @@ static const int kdefaultRadius = 12;
             [self addSubview:self.textMessage];
             self.textMessage.frame = CGRectMake(0, self.loadingCenter.y + self.loadingRadius + klab_load_space, self.frame.size.width, lab_Size.height);
         } else {
-            self.textMessage = nil;
+            self.textMessage.text = nil;
             newFrame = CGRectMake(0, 0, 100, 100);
             self.frame = newFrame;
             self.loadingCenter = self.center;
