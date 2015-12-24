@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XCAmazingLoadingView.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
-
+@property (nonatomic,strong)XCAmazingLoadingView *xcloadingView;
 @end
 

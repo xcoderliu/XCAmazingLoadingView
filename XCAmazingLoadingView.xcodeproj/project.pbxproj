@@ -15,6 +15,7 @@
 		F82EF71E1C2BBCD10040323B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F82EF71C1C2BBCD10040323B /* LaunchScreen.storyboard */; };
 		F82EF7291C2BBCD20040323B /* XCAmazingLoadingViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F82EF7281C2BBCD20040323B /* XCAmazingLoadingViewTests.m */; };
 		F82EF7341C2BBCD20040323B /* XCAmazingLoadingViewUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = F82EF7331C2BBCD20040323B /* XCAmazingLoadingViewUITests.m */; };
+		F82EF7431C2BBCEA0040323B /* XCAmazingLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = F82EF7421C2BBCEA0040323B /* XCAmazingLoadingView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,8 @@
 		F82EF72F1C2BBCD20040323B /* XCAmazingLoadingViewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XCAmazingLoadingViewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F82EF7331C2BBCD20040323B /* XCAmazingLoadingViewUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XCAmazingLoadingViewUITests.m; sourceTree = "<group>"; };
 		F82EF7351C2BBCD20040323B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F82EF7411C2BBCEA0040323B /* XCAmazingLoadingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XCAmazingLoadingView.h; sourceTree = "<group>"; };
+		F82EF7421C2BBCEA0040323B /* XCAmazingLoadingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XCAmazingLoadingView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +108,8 @@
 				F82EF7121C2BBCD10040323B /* AppDelegate.m */,
 				F82EF7141C2BBCD10040323B /* ViewController.h */,
 				F82EF7151C2BBCD10040323B /* ViewController.m */,
+				F82EF7411C2BBCEA0040323B /* XCAmazingLoadingView.h */,
+				F82EF7421C2BBCEA0040323B /* XCAmazingLoadingView.m */,
 				F82EF7171C2BBCD10040323B /* Main.storyboard */,
 				F82EF71A1C2BBCD10040323B /* Assets.xcassets */,
 				F82EF71C1C2BBCD10040323B /* LaunchScreen.storyboard */,
@@ -270,6 +275,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F82EF7431C2BBCEA0040323B /* XCAmazingLoadingView.m in Sources */,
 				F82EF7161C2BBCD10040323B /* ViewController.m in Sources */,
 				F82EF7131C2BBCD10040323B /* AppDelegate.m in Sources */,
 				F82EF7101C2BBCD10040323B /* main.m in Sources */,
