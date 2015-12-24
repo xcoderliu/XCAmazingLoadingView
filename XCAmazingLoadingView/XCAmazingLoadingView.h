@@ -41,11 +41,16 @@
  */
 @property (nonatomic, assign) CGPoint loadingCenter;
 
-
+/**
+ *  文本字体颜色
+ */
 @property (nonatomic, assign) UIColor *textColor;
 
 /**
- *  start loading animation
+ *  加载loading动画
+ *
+ *  @param message 文本显示信息
+ *  @param view    显示的父视图
  */
 - (void)startLoadingWithMessage:(NSString*)message inView:(UIView*)view;
 

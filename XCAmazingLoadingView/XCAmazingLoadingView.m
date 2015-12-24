@@ -130,7 +130,7 @@ static const int kbottomSpace = 16;
     self.hidden = YES;
 }
 
-#pragma mark - SCSkypeActivityIndicatorViewProtocol
+#pragma mark - XCSkypeActivityIndicatorViewProtocol
 
 - (void)startLoadingWithMessage:(NSString*)message inView:(UIView*)view
 {
