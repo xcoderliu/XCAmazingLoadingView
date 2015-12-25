@@ -15,7 +15,6 @@ static const int klab_load_space = 16;
 static const int kbottomSpace = 16;
 static const int ktopSpace = 8;
 static const int kdefaultRadius = 12;
-static const int katleastduration = 1.5;
 
 @interface XCCoverView : UIView<UIGestureRecognizerDelegate>
 
@@ -215,7 +214,7 @@ static const int katleastduration = 1.5;
 
 - (void)stopLoading
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(katleastduration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         if(!self.isLoading) {
             return;
         }
