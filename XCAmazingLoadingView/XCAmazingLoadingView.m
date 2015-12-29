@@ -76,6 +76,10 @@ static const int kdefaultRadius = 12;
 
 @end
 @interface XCAmazingLoadingView ()
+{
+    NSString *_lastMessage;
+    UIView *_lastView;
+}
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, strong) UILabel *textMessage;
 @property (nonatomic, strong) XCCoverView *coverView;
@@ -106,6 +110,15 @@ static const int kdefaultRadius = 12;
     [self _commonInit];
 }
 
+- (void)resumeLoading {
+    if (self.isLoading) {
+        [self stopLoading];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self startLoadingWithMessage:_lastMessage inView:_lastView];
+        });
+    }
+}
+
 - (void)_commonInit
 {
     self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 0.6, 100);
@@ -130,12 +143,17 @@ static const int kdefaultRadius = 12;
     self.backgroundColor = [UIColor colorWithRed:22 / 225.f green:180 / 255.f blue:250 / 255.f alpha:1];
     [self.layer setCornerRadius:8.0f];
     self.hidden = YES;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(resumeLoading)
+                                                 name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
 #pragma mark - XCSkypeActivityIndicatorViewProtocol
 
 - (void)startLoadingWithMessage:(NSString*)message inView:(UIView*)view
 {
+    _lastMessage = message;
+    _lastView = view;
     dispatch_async(dispatch_get_main_queue(), ^{
         
         self.transform = CGAffineTransformIdentity;
@@ -194,7 +212,7 @@ static const int kdefaultRadius = 12;
         self.coverView.alpha = 0.1;
         self.transform = CGAffineTransformScale(self.transform, 0.01, 0.01);
         
-        [UIView animateWithDuration:0.5 delay:0.0 usingSpringWithDamping:0.6 initialSpringVelocity:1 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
+        [UIView animateWithDuration:0.1 delay:0.0 usingSpringWithDamping:0.6 initialSpringVelocity:1 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
             self.transform = CGAffineTransformIdentity;
         } completion:^(BOOL finished) {
             
@@ -224,13 +242,13 @@ static const int kdefaultRadius = 12;
         self.alpha = 1.0;
         self.coverView.alpha = 0.1;
         
-        [UIView animateWithDuration:0.3 delay:0.0 usingSpringWithDamping:0.9 initialSpringVelocity:2 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
+        [UIView animateWithDuration:0.2 delay:0.0 usingSpringWithDamping:0.9 initialSpringVelocity:2 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
             self.transform = CGAffineTransformScale(self.transform, 0.01, 0.01);
             self.alpha = 0.0;
             self.coverView.alpha = 0.0;
         } completion:^(BOOL finished) {
             for(UIView *bubble in self.subviews) {
-                [UIView animateWithDuration:0.8f animations:^{
+                [UIView animateWithDuration:0.1f animations:^{
                     if ([[bubble class] isSubclassOfClass:[UILabel class]]) {
                         return ;
                     }
