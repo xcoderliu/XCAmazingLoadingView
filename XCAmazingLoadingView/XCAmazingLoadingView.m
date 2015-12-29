@@ -110,15 +110,6 @@ static const int kdefaultRadius = 12;
     [self _commonInit];
 }
 
-- (void)resumeLoading {
-    if (self.isLoading) {
-        [self stopLoading];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self startLoadingWithMessage:_lastMessage inView:_lastView];
-        });
-    }
-}
-
 - (void)_commonInit
 {
     self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 0.6, 100);
@@ -144,7 +135,7 @@ static const int kdefaultRadius = 12;
     [self.layer setCornerRadius:8.0f];
     self.hidden = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(resumeLoading)
+                                             selector:@selector(appBecomeActive)
                                                  name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
@@ -265,6 +256,19 @@ static const int kdefaultRadius = 12;
             [self.coverView removeFromSuperview];
         }];
     });
+}
+
+- (void)resumeLoading {
+    if (self.isLoading) {
+        [self stopLoading];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self startLoadingWithMessage:_lastMessage inView:_lastView];
+        });
+    }
+}
+
+- (void)appBecomeActive {
+    [self performSelectorOnMainThread:@selector(resumeLoading) withObject:nil waitUntilDone:YES];
 }
 
 - (XCSkypeActivityIndicatorBubbleView *)bubbleWithTimingFunction:(CAMediaTimingFunction *)timingFunction initialScale:(CGFloat)initialScale finalScale:(CGFloat)finalScale
