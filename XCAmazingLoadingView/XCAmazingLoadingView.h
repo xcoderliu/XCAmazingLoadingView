@@ -12,6 +12,12 @@
 @interface XCAmazingLoadingView : UIView<UIGestureRecognizerDelegate>
 
 /**
+ *
+ *  @return return the loading view
+ */
++ (instancetype)shareLoadingview;
+
+/**
  *  loadingview 点点的个数
  */
 @property (nonatomic, assign) NSUInteger numberOfBubbles;

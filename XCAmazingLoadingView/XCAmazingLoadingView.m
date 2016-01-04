@@ -15,6 +15,7 @@ static const int klab_load_space = 16;
 static const int kbottomSpace = 16;
 static const int ktopSpace = 8;
 static const int kdefaultRadius = 12;
+static XCAmazingLoadingView *_theLoadingview;
 
 @interface XCCoverView : UIView<UIGestureRecognizerDelegate>
 
@@ -75,6 +76,7 @@ static const int kdefaultRadius = 12;
 }
 
 @end
+
 @interface XCAmazingLoadingView ()
 {
     NSString *_lastMessage;
@@ -83,31 +85,31 @@ static const int kdefaultRadius = 12;
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, strong) UILabel *textMessage;
 @property (nonatomic, strong) XCCoverView *coverView;
+
 @end
 
 @implementation XCAmazingLoadingView
-- (instancetype)init
-{
-    if(self = [super init]) {
-        [self _commonInit];
-    }
-    
-    return self;
+
++ (instancetype)shareLoadingview {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _theLoadingview = [[self alloc] init];
+        [_theLoadingview _commonInit];
+    });
+    return _theLoadingview;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    if(self = [super initWithFrame:frame]) {
-        [self _commonInit];
-    }
-    
-    return self;
++ (instancetype)allocWithZone:(struct _NSZone *)zone {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _theLoadingview = [super allocWithZone:zone];
+    });
+    return _theLoadingview;
 }
 
-- (void)awakeFromNib
+- (id)copyWithZone:(NSZone *)zone
 {
-    [super awakeFromNib];
-    [self _commonInit];
+    return _theLoadingview;
 }
 
 - (void)_commonInit
