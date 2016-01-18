@@ -18,6 +18,11 @@
 + (instancetype)shareLoadingview;
 
 /**
+ *  loadingview 点点的颜色
+ */
+@property (nonatomic, strong) UIColor *loadingBkColor;
+
+/**
  *  loadingview 点点的个数
  */
 @property (nonatomic, assign) NSUInteger numberOfBubbles;

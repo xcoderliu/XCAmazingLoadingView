@@ -133,7 +133,7 @@ static XCAmazingLoadingView *_theLoadingview;
     self.textColor = [UIColor whiteColor];
     self.textMessage.numberOfLines = 0;
     self.textMessage.lineBreakMode = NSLineBreakByWordWrapping;
-    self.backgroundColor = [UIColor colorWithRed:22 / 225.f green:180 / 255.f blue:250 / 255.f alpha:1];
+    self.loadingBkColor = [UIColor colorWithRed:22 / 225.f green:180 / 255.f blue:250 / 255.f alpha:1];
     [self.layer setCornerRadius:8.0f];
     self.hidden = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -148,6 +148,8 @@ static XCAmazingLoadingView *_theLoadingview;
     _lastMessage = message;
     _lastView = view;
     dispatch_async(dispatch_get_main_queue(), ^{
+        
+        self.backgroundColor = self.loadingBkColor;
         
         self.transform = CGAffineTransformIdentity;
         
