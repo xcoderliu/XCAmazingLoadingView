@@ -18,7 +18,7 @@
 + (instancetype)shareLoadingview;
 
 /**
- *  loadingview 点点的颜色
+ *  loadingBkColor 背景颜色
  */
 @property (nonatomic, strong) UIColor *loadingBkColor;
 
