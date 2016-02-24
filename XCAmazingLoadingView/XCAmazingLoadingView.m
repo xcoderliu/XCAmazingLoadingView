@@ -154,6 +154,9 @@ static XCAmazingLoadingView *_theLoadingview;
         self.transform = CGAffineTransformIdentity;
         
         if(self.isLoading || !self.isHidden) {
+            if (self.isLoading && ![_lastMessage isEqualToString:self.textMessage.text]) {
+                [self resetLayoutBytextChange];
+            }
             return;
         }
         
@@ -164,42 +167,7 @@ static XCAmazingLoadingView *_theLoadingview;
         [view insertSubview:self.coverView belowSubview:self];
         [self.coverView setCenter:view.center];
         
-        self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 0.6, 100);
-        
-        self.loadingCenter = CGPointMake(self.center.x, kdefaultRadius + self.bubbleSize.width + ktopSpace);
-        
-        self.textMessage.hidden = message ? NO : YES;
-        
-        CGRect newFrame = self.frame;
-        
-        if ([[message stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]) {
-            NSMutableAttributedString* attrString = [[NSMutableAttributedString alloc] initWithString:message];
-            NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
-            [style setLineSpacing:7];
-            [style setAlignment:NSTextAlignmentCenter];
-            [style setLineBreakMode:NSLineBreakByWordWrapping];
-            [attrString addAttribute:NSParagraphStyleAttributeName
-                               value:style
-                               range:NSMakeRange(0, attrString.length)];
-            
-            self.textMessage.attributedText = attrString;
-            self.textMessage.textColor = self.textColor;
-            self.textMessage.alpha = 1.0;
-            CGSize lab_Size = [self.textMessage sizeThatFits:CGSizeMake(self.bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-            
-            CGFloat resetHeight = self.loadingCenter.y + self.loadingRadius + klab_load_space + lab_Size.height + kbottomSpace;
-            newFrame.size.height = resetHeight;
-            self.frame = newFrame;
-            [self addSubview:self.textMessage];
-            self.textMessage.frame = CGRectMake(0, self.loadingCenter.y + self.loadingRadius + klab_load_space, self.frame.size.width, lab_Size.height);
-        } else {
-            self.textMessage.text = nil;
-            newFrame = CGRectMake(0, 0, 100, 100);
-            self.frame = newFrame;
-            self.loadingCenter = self.center;
-        }
-        
-        self.center = view.center;
+        [self resetLayoutBytextChange];
         
         self.isLoading = YES;
         self.hidden = NO;
@@ -223,6 +191,45 @@ static XCAmazingLoadingView *_theLoadingview;
             }];
         }
     });
+}
+
+- (void)resetLayoutBytextChange {
+    self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 0.6, 100);
+    
+    self.loadingCenter = CGPointMake(self.center.x, kdefaultRadius + self.bubbleSize.width + ktopSpace);
+    
+    self.textMessage.hidden = _lastMessage ? NO : YES;
+    
+    CGRect newFrame = self.frame;
+    
+    if ([[_lastMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]) {
+        NSMutableAttributedString* attrString = [[NSMutableAttributedString alloc] initWithString:_lastMessage];
+        NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+        [style setLineSpacing:7];
+        [style setAlignment:NSTextAlignmentCenter];
+        [style setLineBreakMode:NSLineBreakByWordWrapping];
+        [attrString addAttribute:NSParagraphStyleAttributeName
+                           value:style
+                           range:NSMakeRange(0, attrString.length)];
+        
+        self.textMessage.attributedText = attrString;
+        self.textMessage.textColor = self.textColor;
+        self.textMessage.alpha = 1.0;
+        CGSize lab_Size = [self.textMessage sizeThatFits:CGSizeMake(self.bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
+        
+        CGFloat resetHeight = self.loadingCenter.y + self.loadingRadius + klab_load_space + lab_Size.height + kbottomSpace;
+        newFrame.size.height = resetHeight;
+        self.frame = newFrame;
+        [self addSubview:self.textMessage];
+        self.textMessage.frame = CGRectMake(0, self.loadingCenter.y + self.loadingRadius + klab_load_space, self.frame.size.width, lab_Size.height);
+    } else {
+        self.textMessage.text = nil;
+        newFrame = CGRectMake(0, 0, 100, 100);
+        self.frame = newFrame;
+        self.loadingCenter = self.center;
+    }
+    
+    self.center = _lastView.center;
 }
 
 - (void)stopLoading

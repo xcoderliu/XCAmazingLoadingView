@@ -19,19 +19,33 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"   " inView:self.view];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [[XCAmazingLoadingView shareLoadingview] stopLoading];
+//    [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"   " inView:self.view];
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [[XCAmazingLoadingView shareLoadingview] stopLoading];
+//    });
+//    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
+//    [self.view addGestureRecognizer:tapGesture];
+//    
+//    UIButton *btn_test = [[UIButton alloc] initWithFrame:CGRectMake(20, 100, 100, 50)];
+//    [btn_test setTitle:@"Test" forState:UIControlStateNormal];
+//    [btn_test setTintColor:[UIColor blackColor]];
+//    [btn_test addTarget:self action:@selector(test) forControlEvents:UIControlEventTouchUpInside];
+//    
+//    [self.view addSubview:btn_test];
+    
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        for (int i = 0; i < 101; i++) {
+            usleep(10000);
+            [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:[NSString stringWithFormat:@"加载: %d%%",i] inView:self.view];
+            if (i == 100) {
+                [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"加载结束" inView:self.view];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [[XCAmazingLoadingView shareLoadingview] stopLoading];
+                });
+            }
+        }
     });
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
-    [self.view addGestureRecognizer:tapGesture];
-    
-    UIButton *btn_test = [[UIButton alloc] initWithFrame:CGRectMake(20, 100, 100, 50)];
-    [btn_test setTitle:@"Test" forState:UIControlStateNormal];
-    [btn_test setTintColor:[UIColor blackColor]];
-    [btn_test addTarget:self action:@selector(test) forControlEvents:UIControlEventTouchUpInside];
-    
-    [self.view addSubview:btn_test];
 }
 
 - (void)didReceiveMemoryWarning {
