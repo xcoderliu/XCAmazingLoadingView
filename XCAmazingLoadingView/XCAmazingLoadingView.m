@@ -7,14 +7,17 @@
 //
 
 #import "XCAmazingLoadingView.h"
+#import <math.h>
 
 static NSString * const kSkypeCurveAnimationKey = @"kSkypeCurveAnimationKey";
 static NSString * const kSkypeScaleAnimationKey = @"kSkypeScaleAnimationKey";
 
-static const int klab_load_space = 16;
-static const int kbottomSpace = 16;
-static const int ktopSpace = 8;
+static const int klab_load_space = 18;
+static const int kbottomSpace = 18;
+static const int ktopSpace = 14;
 static const int kdefaultRadius = 12;
+static const CGFloat kViewWidthScale = 0.6;
+static const CGFloat kFullModeViewWidthScale = 0.8;
 static XCAmazingLoadingView *_theLoadingview;
 
 @interface XCCoverView : UIView<UIGestureRecognizerDelegate>
@@ -81,6 +84,7 @@ static XCAmazingLoadingView *_theLoadingview;
 {
     NSString *_lastMessage;
     UIView *_lastView;
+    CGPoint _lastLoadingCenter;
 }
 @property (nonatomic, assign) BOOL isLoading;
 @property (nonatomic, strong) UILabel *textMessage;
@@ -114,28 +118,34 @@ static XCAmazingLoadingView *_theLoadingview;
 
 - (void)_commonInit
 {
-    self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 0.6, 100);
+    self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * kViewWidthScale, 100);
     self.coverView = [[XCCoverView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
     self.coverView.backgroundColor = [UIColor blackColor];
     self.coverView.alpha = 0.1;
-    self.numberOfBubbles = 5;
-    self.animationDuration = 1.5f;
-    self.bubbleSize = CGSizeMake(6, 6);
-    self.bubbleColor = [UIColor whiteColor];
-    self.loadingRadius = kdefaultRadius;
-    self.loadingCenter = CGPointMake(self.center.x, kdefaultRadius + self.bubbleSize.width + ktopSpace);
+    self.showMode = normalMode;
     self.textColor = [UIColor whiteColor];
     self.textMessage = [UILabel new];
     self.textMessage.textAlignment = NSTextAlignmentCenter;
     self.textMessage.textColor = self.textColor;
-    [self addSubview:self.textMessage];
     self.textMessage.hidden = YES;
     self.textColor = [UIColor whiteColor];
     self.textMessage.numberOfLines = 0;
     self.textMessage.lineBreakMode = NSLineBreakByWordWrapping;
+    [self addSubview:self.textMessage];
     self.loadingBkColor = [UIColor colorWithRed:22 / 225.f green:180 / 255.f blue:250 / 255.f alpha:1];
     [self.layer setCornerRadius:8.0f];
     self.hidden = YES;
+    self.animationDuration = 1.5f;
+    
+    //SkypeAnimation
+    
+    self.animationType = skypeAnimation;
+    self.numberOfBubbles = 5;
+    self.bubbleSize = CGSizeMake(6, 6);
+    self.bubbleColor = [UIColor whiteColor];
+    self.loadingRadius = kdefaultRadius;
+    self.loadingCenter = CGPointMake(self.center.x, kdefaultRadius + self.bubbleSize.width + ktopSpace);
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(appBecomeActive)
                                                  name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -156,6 +166,12 @@ static XCAmazingLoadingView *_theLoadingview;
         if(self.isLoading || !self.isHidden) {
             if (self.isLoading && ![_lastMessage isEqualToString:self.textMessage.text]) {
                 [self resetLayoutBytextChange];
+                if (fabs(_lastLoadingCenter.x - self.loadingCenter.x) >= 8 || fabs(_lastLoadingCenter.y - self.loadingCenter.y) >= 8) {
+                    if (self.textMessage.text != nil || self.showMode != fullScreenMode) {
+                        [self resumeLoading];
+                        _lastLoadingCenter = self.loadingCenter;
+                    }
+                }
             }
             return;
         }
@@ -168,6 +184,7 @@ static XCAmazingLoadingView *_theLoadingview;
         [self.coverView setCenter:view.center];
         
         [self resetLayoutBytextChange];
+        _lastLoadingCenter = self.loadingCenter;
         
         self.isLoading = YES;
         self.hidden = NO;
@@ -175,32 +192,20 @@ static XCAmazingLoadingView *_theLoadingview;
         self.coverView.alpha = 0.1;
         self.transform = CGAffineTransformScale(self.transform, 0.01, 0.01);
         
-        [UIView animateWithDuration:0.1 delay:0.0 usingSpringWithDamping:0.6 initialSpringVelocity:1 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
-            self.transform = CGAffineTransformIdentity;
-        } completion:^(BOOL finished) {
-            
-        }];
-        
-        for(NSUInteger i = 0; i < self.numberOfBubbles; i++) {
-            CGFloat x = i * (1.0f / self.numberOfBubbles);
-            XCSkypeActivityIndicatorBubbleView *bubbleView = [self bubbleWithTimingFunction:[CAMediaTimingFunction functionWithControlPoints:0.5f :(0.1f + x) :0.25f :1.0f] initialScale:1.0f - x finalScale:0.2f + x];
-            [bubbleView setAlpha:0.0f];
-            [self addSubview:bubbleView];
-            [UIView animateWithDuration:0.8f animations:^{
-                [bubbleView setAlpha:1.0f];
-            }];
+        if (self.animationType == skypeAnimation) {
+            [self skypeAnimationStart];
         }
     });
 }
 
 - (void)resetLayoutBytextChange {
-    self.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * 0.6, 100);
-    
-    self.loadingCenter = CGPointMake(self.center.x, kdefaultRadius + self.bubbleSize.width + ktopSpace);
-    
     self.textMessage.hidden = _lastMessage ? NO : YES;
     
     CGRect newFrame = self.frame;
+    
+    self.frame = self.showMode == normalMode ? CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * kViewWidthScale, 100) : CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+    
+    self.loadingCenter = self.showMode == fullScreenMode ?  CGPointMake(self.center.x,[UIScreen mainScreen].bounds.size.height / 2 - self.loadingRadius - self.bubbleSize.width - ktopSpace): CGPointMake(self.center.x, self.loadingRadius + self.bubbleSize.width + ktopSpace);
     
     if ([[_lastMessage stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]) {
         NSMutableAttributedString* attrString = [[NSMutableAttributedString alloc] initWithString:_lastMessage];
@@ -215,17 +220,20 @@ static XCAmazingLoadingView *_theLoadingview;
         self.textMessage.attributedText = attrString;
         self.textMessage.textColor = self.textColor;
         self.textMessage.alpha = 1.0;
-        CGSize lab_Size = [self.textMessage sizeThatFits:CGSizeMake(self.bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-        
-        CGFloat resetHeight = self.loadingCenter.y + self.loadingRadius + klab_load_space + lab_Size.height + kbottomSpace;
-        newFrame.size.height = resetHeight;
-        self.frame = newFrame;
+        CGSize lab_Size = [self.textMessage sizeThatFits:CGSizeMake([UIScreen mainScreen].bounds.size.width * (self.showMode == fullScreenMode ? kFullModeViewWidthScale : kViewWidthScale), [UIScreen mainScreen].bounds.size.height)];
+        if (self.showMode != fullScreenMode) {
+            CGFloat resetHeight = self.loadingCenter.y + self.loadingRadius + klab_load_space + lab_Size.height + kbottomSpace;
+            newFrame.size.height = resetHeight;
+            self.frame = newFrame;
+        }
         [self addSubview:self.textMessage];
         self.textMessage.frame = CGRectMake(0, self.loadingCenter.y + self.loadingRadius + klab_load_space, self.frame.size.width, lab_Size.height);
     } else {
         self.textMessage.text = nil;
-        newFrame = CGRectMake(0, 0, 100, 100);
-        self.frame = newFrame;
+        if (self.showMode != fullScreenMode) {
+            newFrame = CGRectMake(0, 0, 100, 100);
+            self.frame = newFrame;
+        }
         self.loadingCenter = self.center;
     }
     
@@ -244,28 +252,9 @@ static XCAmazingLoadingView *_theLoadingview;
         self.alpha = 1.0;
         self.coverView.alpha = 0.1;
         
-        [UIView animateWithDuration:0.2 delay:0.0 usingSpringWithDamping:0.9 initialSpringVelocity:2 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
-            self.transform = CGAffineTransformScale(self.transform, 0.01, 0.01);
-            self.alpha = 0.0;
-            self.coverView.alpha = 0.0;
-        } completion:^(BOOL finished) {
-            for(UIView *bubble in self.subviews) {
-                [UIView animateWithDuration:0.1f animations:^{
-                    if ([[bubble class] isSubclassOfClass:[UILabel class]]) {
-                        return ;
-                    }
-                    [bubble setAlpha:0.0f];
-                } completion:^(BOOL finished) {
-                    if ([[bubble class] isSubclassOfClass:[UILabel class]]) {
-                        return ;
-                    }
-                    [bubble.layer removeAllAnimations];
-                    [bubble removeFromSuperview];
-                }];
-            }
-            self.hidden = YES;
-            [self.coverView removeFromSuperview];
-        }];
+        if (_animationType == skypeAnimation) {
+            [self skypeAnimationStop];
+        }
     });
 }
 
@@ -317,6 +306,49 @@ static XCAmazingLoadingView *_theLoadingview;
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     return NO;
+}
+
+- (void)skypeAnimationStart {
+    [UIView animateWithDuration:0.1 delay:0.0 usingSpringWithDamping:0.6 initialSpringVelocity:1 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.transform = CGAffineTransformIdentity;
+    } completion:^(BOOL finished) {
+        
+    }];
+    
+    for(NSUInteger i = 0; i < self.numberOfBubbles; i++) {
+        CGFloat x = i * (1.0f / self.numberOfBubbles);
+        XCSkypeActivityIndicatorBubbleView *bubbleView = [self bubbleWithTimingFunction:[CAMediaTimingFunction functionWithControlPoints:0.5f :(0.1f + x) :0.25f :1.0f] initialScale:1.0f - x finalScale:0.2f + x];
+        [bubbleView setAlpha:0.0f];
+        [self addSubview:bubbleView];
+        [UIView animateWithDuration:0.8f animations:^{
+            [bubbleView setAlpha:1.0f];
+        }];
+    }
+}
+
+- (void)skypeAnimationStop {
+    [UIView animateWithDuration:0.2 delay:0.0 usingSpringWithDamping:0.9 initialSpringVelocity:2 options:UIViewAnimationOptionLayoutSubviews | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.transform = CGAffineTransformScale(self.transform, 0.01, 0.01);
+        self.alpha = 0.0;
+        self.coverView.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        for(UIView *bubble in self.subviews) {
+            [UIView animateWithDuration:0.1f animations:^{
+                if ([[bubble class] isSubclassOfClass:[UILabel class]]) {
+                    return ;
+                }
+                [bubble setAlpha:0.0f];
+            } completion:^(BOOL finished) {
+                if ([[bubble class] isSubclassOfClass:[UILabel class]]) {
+                    return ;
+                }
+                [bubble.layer removeAllAnimations];
+                [bubble removeFromSuperview];
+            }];
+        }
+        self.hidden = YES;
+        [self.coverView removeFromSuperview];
+    }];
 }
 
 @end

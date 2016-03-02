@@ -9,8 +9,18 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+typedef enum {
+    skypeAnimation = 0
+}loadAnimations;
+
+typedef enum {
+    normalMode = 0,
+    fullScreenMode = 1
+}loadMode;
+
 @interface XCAmazingLoadingView : UIView<UIGestureRecognizerDelegate>
 
+@property (assign,nonatomic) loadAnimations animationType;
 /**
  *
  *  @return return the loading view
@@ -22,6 +32,37 @@
  */
 @property (nonatomic, strong) UIColor *loadingBkColor;
 
+/**
+ *  文本字体颜色
+ */
+@property (nonatomic, assign) UIColor *textColor;
+
+/**
+ *
+ *  显示的模式
+ */
+@property (nonatomic, assign) loadMode showMode;
+
+/**
+ *  加载loading动画
+ *
+ *  @param message 文本显示信息
+ *  @param view    显示的父视图
+ */
+- (void)startLoadingWithMessage:(NSString*)message inView:(UIView*)view;
+
+/**
+ *  stop loading animation
+ */
+- (void)stopLoading;
+
+/**
+ *
+ *  @return is loading
+ */
+- (BOOL)isLoading;
+
+#pragma mark - SkypeAnimation
 /**
  *  loadingview 点点的个数
  */
@@ -51,28 +92,4 @@
  *  loading 的中心点
  */
 @property (nonatomic, assign) CGPoint loadingCenter;
-
-/**
- *  文本字体颜色
- */
-@property (nonatomic, assign) UIColor *textColor;
-
-/**
- *  加载loading动画
- *
- *  @param message 文本显示信息
- *  @param view    显示的父视图
- */
-- (void)startLoadingWithMessage:(NSString*)message inView:(UIView*)view;
-
-/**
- *  stop loading animation
- */
-- (void)stopLoading;
-
-/**
- *
- *  @return is loading
- */
-- (BOOL)isLoading;
 @end
