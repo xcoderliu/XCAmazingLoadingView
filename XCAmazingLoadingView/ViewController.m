@@ -39,7 +39,7 @@
             usleep(10000);
             [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:[NSString stringWithFormat:@"加载: %d%%",i] inView:self.view];
             if (i == 100) {
-                [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"" inView:self.view];
+                [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"加载结束" inView:self.view];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [[XCAmazingLoadingView shareLoadingview] stopLoading];
                 });
