@@ -201,9 +201,9 @@ static XCAmazingLoadingView *_theLoadingview;
 - (void)resetLayoutBytextChange {
     self.textMessage.hidden = _lastMessage ? NO : YES;
     
-    CGRect newFrame = self.frame;
-    
     self.frame = self.showMode == normalMode ? CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width * kViewWidthScale, 100) : CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+    
+    CGRect newFrame = self.frame;
     
     self.loadingCenter = self.showMode == fullScreenMode ?  CGPointMake(self.center.x,[UIScreen mainScreen].bounds.size.height / 2 - self.loadingRadius - self.bubbleSize.width - ktopSpace): CGPointMake(self.center.x, self.loadingRadius + self.bubbleSize.width + ktopSpace);
     
@@ -236,7 +236,6 @@ static XCAmazingLoadingView *_theLoadingview;
         }
         self.loadingCenter = self.center;
     }
-    
     self.center = _lastView.center;
 }
 
