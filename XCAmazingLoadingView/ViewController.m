@@ -8,7 +8,9 @@
 
 #import "ViewController.h"
 #import "AppDelegate.h"
+
 #define theApp ((AppDelegate*)[[UIApplication sharedApplication] delegate])
+#define RGBColor(r, g, b) ([UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:1.0])
 
 @interface ViewController ()
 
@@ -33,19 +35,30 @@
     //    
     //    [self.view addSubview:btn_test];
     
-    //        [[XCAmazingLoadingView shareLoadingview] setShowMode:fullScreenMode];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        for (int i = 0; i < 101; i++) {
-            usleep(10000);
-            [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:[NSString stringWithFormat:@"加载: %d%%",i] inView:self.view];
-            if (i == 100) {
-                [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"加载结束" inView:self.view];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [[XCAmazingLoadingView shareLoadingview] stopLoading];
-                });
-            }
-        }
+    [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:nil inView:self.view];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [[XCAmazingLoadingView shareLoadingview] stopLoading];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[XCAmazingLoadingView shareLoadingview] setShowMode:fullScreenMode];
+            [[XCAmazingLoadingView shareLoadingview] setLoadingBkColor:RGBColor(15, 126, 211)];
+            [[XCAmazingLoadingView shareLoadingview] setBubbleSize:CGSizeMake(8, 8)];
+            [[XCAmazingLoadingView shareLoadingview] setAnimationDuration:2.5f];
+            [[XCAmazingLoadingView shareLoadingview] setLoadingRadius:16];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                for (int i = 0; i < 101; i++) {
+                    usleep(10000);
+                    [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:[NSString stringWithFormat:@"加载: %d%%",i] inView:self.view];
+                    if (i == 100) {
+                        [[XCAmazingLoadingView shareLoadingview] startLoadingWithMessage:@"加载结束" inView:self.view];
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                            [[XCAmazingLoadingView shareLoadingview] stopLoading];
+                        });
+                    }
+                }
+            });
+        });
     });
+    
 }
 
 - (void)didReceiveMemoryWarning {

@@ -163,6 +163,8 @@ static XCAmazingLoadingView *_theLoadingview;
         
         self.transform = CGAffineTransformIdentity;
         
+        self.layer.cornerRadius = self.showMode == normalMode ? 8.0f : 0.0f;
+        
         if(self.isLoading || !self.isHidden) {
             if (self.isLoading && ![_lastMessage isEqualToString:self.textMessage.text]) {
                 [self resetLayoutBytextChange];
